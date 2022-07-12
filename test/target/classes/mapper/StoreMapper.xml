@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.test.test.dao.StoreMapper">
+
+    <sql id="stores">
+        SELECT ID,GU,REG_DATE,GOOD,HOLIDAY,LAT,LON,ADDRESS,POST_NUM,STORENAME,FRANCHISE,MASTER,EAT,CORPS,MAINIMG,MAINMENU
+        FROM STORE
+    </sql>
+
+    <!--가게등록-->
+    <insert id="insert" parameterType="StoreDto">
+        INSERT INTO STORE
+        (GU,REG_DATE,HOLIDAY,LAT,LON,ADDRESS,POST_NUM,STORENAME,FRANCHISE,MASTER,EAT,CORPS,MAINMENU)
+        VALUES
+        (#{gu},#{reg_date},#{holiday},#{lat},#{lon},#{address},#{post_num},#{storeName},#{franchise},#{master},#{eat},#{corps},#{mainimg},#{mainMenu})
+    </insert>
+
+    <!--가게 1개 정보-->
+    <select id="selectOne" parameterType="int" resultType="StoreDto">
+        <include refid="stores"/>
+        where ID = #{id}
+    </select>
+
+    <!--전체가게 목록 정렬 id 순-->
+    <select id="selectAll" resultType="StoreDto">
+        SELECT GU,REG_DATE,GOOD,HOLIDAY,LAT,LON,ADDRESS,POST_NUM,STORENAME,FRANCHISE,MASTER,EAT,CORPS,MAINMENU,ID,MAINIMG
+        FROM STORE
+        ORDER BY ID ASC
+    </select>
+
+    <!--가게 수정-->
+    <update id="update" parameterType="int">
+        UPDATE STORE
+        SET GU = #{gu},
+            REG_DATE= #{reg_date},
+            HOLIDAY = #{holiday},
+            LAT = #{lat},
+            LON = #{lon},
+            ADDRESS = #{address},
+            POST_NUM = #{post_num},
+            STORENAME = #{storeName},
+            FRANCHISE = #{franchise},
+            MASTER = #{master},
+            EAT = #{eat},
+            CORPS = #{corps},
+            MAINIMG = #{mainimg},
+            MAINMENU = #{mainMenu}
+            WHERE ID = #{id}
+    </update>
+
+    <!--가게 삭제-->
+    <delete id="delete" parameterType="int">
+        DELETE FROM STORE
+        WHERE ID = #{id}
+    </delete>
+
+    <!--좋아요 1증가 (유저랑 상의 필요)-->
+    <update id="goodCnt" parameterType="int">
+        UPDATE STORE
+        SET   good = good + 1
+        WHERE id = #{id}
+    </update>
+
+    <!--시,도 값 넘어오면 해당 가게만 검색 -->
+    <select id="Region" parameterType="String" resultType="StoreDto">
+        <include refid="stores"/>
+        where address like #{address} || '%'
+    </select>
+
+<!--    <select id="searchStore" parameterType="String" resultType="StoreDto">-->
+<!--        <include refid="stores"/>-->
+<!--        <include refid="searchCondition"/>-->
+<!--    </select>-->
+
+    <!--검색조건별 가게 select + 페이징 -->
+    <select id="selectResultPage" resultType="StoreDto">
+        select ID,GU,REG_DATE,HOLIDAY,LAT,LON,ADDRESS,POST_NUM,STORENAME,FRANCHISE,MASTER,EAT,CORPS,MAINMENU
+        from (
+            select
+             rownum as rn,ID,GU,REG_DATE,HOLIDAY,LAT,LON,ADDRESS,POST_NUM,STORENAME,FRANCHISE,MASTER,EAT,CORPS,MAINMENU
+             from STORE
+             <include refid="searchCondition"/>
+              and <![CDATA[ rownum <= #{pageNum} * #{amount}]]>
+             )
+        where <![CDATA[rn > (#{pageNum}-1) * #{amount}]]>
+    </select>
+
+    <!--전체 가게 페이징 -->
+    <select id="selectAllPage" resultType="StoreDto">
+        select ID,GU,REG_DATE,HOLIDAY,LAT,LON,ADDRESS,POST_NUM,STORENAME,FRANCHISE,MASTER,EAT,CORPS,MAINMENU
+        from (
+        select
+        rownum as rn,ID,GU,REG_DATE,HOLIDAY,LAT,LON,ADDRESS,POST_NUM,STORENAME,FRANCHISE,MASTER,EAT,CORPS,MAINMENU
+        from STORE
+         where <![CDATA[ rownum <= #{pageNum} * #{amount}]]>
+        )
+        where <![CDATA[rn > (#{pageNum}-1) * #{amount}]]>
+    </select>
+
+    <!-- 가게 개수(조건별 변경) -->
+    <select id="count" parameterType="SearchCondition" resultType="int">
+        SELECT count(*)
+        from (
+            <include refid="stores"/>
+            <include refid="searchCondition"/>
+             )
+    </select>
+
+<!--    <select id="searchSelectPage" parameterType="SearchCondition" resultType="StoreDto">-->
+<!--        <include refid="stores"/>-->
+<!--        <include refid="searchCondition"/>-->
+<!--    </select>-->
+
+    <sql id="searchCondition">
+        <choose>
+            <when test='type=="master"'>
+                where ${type}='Y'
+            </when>
+            <when test='type=="corps"'>
+                where ${type}='Y'
+            </when>
+            <when test='type=="master"'>
+                where ${type}='Y'
+            </when>
+            <when test='type=="eat"'>
+                where ${type}='Y'
+            </when>
+            <when test='type=="franchise"'>
+                where ${type}='Y'
+            </when>
+            <when test='type=="holiday"and keyword!=null'>
+                 where ${type}=#{keyword}
+            </when>
+            <when test='type=="holiday"and keyword==null'>
+                where holiday in (1,2,3,4,5,6)
+            </when>
+            <when test='type=="mainMenu"and keyword==null'>
+                where mainMenu in (1,2,3,4,5,6,7,8,9,10)
+            </when>
+            <when test='type=="holiday"and keyword!=null'>
+                where ${type}=#{keyword}
+            </when>
+            <when test='type==null and keyword==null'>
+
+            </when>
+            <otherwise>
+                where ${type}=#{keyword}
+            </otherwise>
+        </choose>
+    </sql>
+
+</mapper>

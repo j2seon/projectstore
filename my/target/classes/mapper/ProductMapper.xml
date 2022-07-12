@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.my.pro.dao.ProductMapper">
+
+    <insert id="insert"  parameterType="ProductDto" >
+        INSERT INTO goods
+        (price,goodsName,subName,content,gdImg,gdThum,cateCode,cateCodeRef,energy,protein,per,sodium,suger,fat,reg_date,up_date)
+        VALUES
+        (#{price},#{goodsName},#{subName},#{content},#{gdImg},#{gdThum},#{cateCode},#{cateCodeRef},#{energy},#{protein},#{per},#{sodium},#{suger},#{fat},now(),now())
+    </insert>
+
+    <sql id="selectFromPro">
+        SELECT goodsNum, price ,goodsName,subName,content,gdImg,gdThum,cateCode,cateCodeRef,energy,protein,per,sodium,suger,fat,reg_date,up_date
+        FROM goods
+    </sql>
+
+    <select id="select" parameterType="int" resultType="ProductDto">
+        <include refid="selectFromPro"/>
+        WHERE goodsNum = #{goodsNum}
+    </select>
+
+
+    <select id="selectAll" resultType="ProductDto">
+        SELECT
+            goodsNum, price ,goodsName,subName,content,cateCode,cateCodeRef,energy,protein,per,sodium,suger,fat,reg_date,up_date
+            From goods
+            order by goodsNum asc
+    </select>
+
+
+    <select id="searchSelectPage" parameterType="SearchCondition" resultType="ProductDto">
+        <include refid="selectFromPro"/>
+        WHERE true
+        <include refid="searchCondition"/>
+        ORDER BY reg_date DESC
+        LIMIT #{offset}, #{rowCnt}
+    </select>
+
+    <select id="searchResultCount" parameterType="SearchCondition" resultType="int">
+        SELECT count(*)
+        FROM goods
+        WHERE true
+        <include refid="searchCondition"/>
+    </select>
+
+
+    <sql id="searchCondition">
+        <choose>
+            <when test='option=="T"'>
+                AND goodsName LIKE concat('%', #{keyword},'%')
+            </when>
+            <when test='option=="W"'>
+                AND cateCode LIKE concat('%', #{keyword},'%')
+            </when>
+            <otherwise>
+                AND (cateCode LIKE concat('%', #{keyword},'%')
+                OR cateCodeRef LIKE concat('%', #{keyword},'%'))
+            </otherwise>
+        </choose>
+    </sql>
+
+    <update id="update" parameterType="ProductDto">
+        UPDATE goods
+        SET price = #{price},
+            goodsName = #{goodsName},
+            subName = #{subName},
+            content = #{content},
+            gdImg = #{gdImg},
+            gdThum = #{gdThum},
+            cateCode = #{cateCode},
+            cateCodeRef = #{cateCodeRef},
+            energy = #{energy},
+            protein = #{protein},
+            per = #{per},
+            sodium = #{sodium},
+            suger = #{suger},
+            fat = #{fat},
+            up_date = now()
+        WHERE goodsNum = #{goodsNum}
+    </update>
+
+    <delete id="delete" parameterType="int">
+        DELETE FROM goods
+        WHERE goodsNum = #{goodsNum}
+    </delete>
+
+<!--    <select id="selectAll" resultType="ProductDto">-->
+<!--        <include refid="selectFromPro"/>-->
+<!--        ORDER BY cateCodeRef asc-->
+<!--    </select>-->
+
+<!--    <select id="select" parameterType="String" resultType="ProductDto">-->
+<!--        select g.price,g.goodsName,g.subName,g.content,g.energy,g.protein,g.per,g.sodium,g.suger,g.fat,c.cateCode,c.cateCodeRef,c.cateName-->
+<!--        from goods g-->
+<!--        inner join goodcate c-->
+<!--        on g.cateCode = c.cateCode-->
+<!--        where g.cateCode = #{cateCode}-->
+<!--    </select>-->
+
+    <select id="count" resultType="int">
+        SELECT count(*)
+        FROM goods
+    </select>
+
+    <resultMap id="goods" type="ProductDto" >
+        <result column="goodsNum" property="goodsNum"/>
+        <result column="price" property="price"/>
+        <result column="goodName" property="goodName"/>
+        <result column="subName" property="subName"/>
+        <result column="content" property="content"/>
+        <result column="gdImg" property="gdImg"/>
+        <result column="gdThum" property="gdThum"/>
+        <result column="energy" property="energy"/>
+        <result column="protein" property="protein"/>
+        <result column="sodium" property="sodium"/>
+        <result column="suger" property="suger"/>
+        <result column="fat" property="fat"/>
+        <result column="cateCode" property="cateCode"/>
+        <result column="cateCodeRef" property="cateCodeRef"/>
+        <result column="reg_date" property="reg_date"/>
+        <result column="up_date" property="up_date"/>
+    </resultMap>
+
+    <resultMap id="goodcate" type="CateDto">
+        <result column="cateName" property="cateName"/>
+        <result column="cateCode" property="cateCode"/>
+        <result column="cateCodeRef" property="cateCodeRef"/>
+    </resultMap>
+
+    <select id="selectNum" parameterType="int" resultType="ProductDto">
+        select g.goodsNum, g.price,g.goodsName,g.subName,g.content,g.gdImg,g.gdThum,g.energy,g.protein,g.per,g.sodium,g.suger,g.fat,g.reg_date,g.up_date,c.cateCode,c.cateCodeRef,c.cateName
+        from goods g
+        inner join goodcate c
+        on g.cateCode = c.cateCode
+        where g.goodsNum = #{goodsNum};
+    </select>
+
+
+
+
+
+
+
+<!--    <select id="searchResultCount" parameterType="SearchCondition" resultType="int">-->
+<!--        SELECT count(*)-->
+<!--        FROM board-->
+<!--        WHERE true-->
+<!--        <include refid="searchCondition"/>-->
+<!--    </select>-->
+
+
+
+<!--    <sql id="searchCondition">-->
+<!--        <choose>-->
+<!--            <when test='option=="T"'>-->
+<!--                AND title LIKE concat('%', #{keyword}, '%')-->
+<!--            </when>-->
+<!--            <when test='option=="W"'>-->
+<!--                AND writer LIKE concat('%', #{keyword}, '%')-->
+<!--            </when>-->
+<!--            <otherwise>-->
+<!--                AND (title   LIKE concat('%', #{keyword}, '%')-->
+<!--                OR   content LIKE concat('%', #{keyword}, '%'))-->
+<!--            </otherwise>-->
+<!--        </choose>-->
+<!--    </sql>-->
+
+<!--    <select id="searchSelectPage" parameterType="SearchCondition" resultType="BoardDto">-->
+<!--        SELECT bno, title, content, writer, view_cnt, comment_cnt, reg_date-->
+<!--        FROM  board-->
+<!--        WHERE true-->
+<!--        <include refid="searchCondition"/>-->
+<!--        ORDER BY reg_date DESC, bno DESC-->
+<!--        LIMIT #{offset}, #{pageSize}-->
+<!--    </select>-->
+
+<!--    <select id="searchResultCnt" parameterType="SearchCondition" resultType="int">-->
+<!--        SELECT count(*)-->
+<!--        FROM  board-->
+<!--        WHERE true-->
+<!--        <include refid="searchCondition"/>-->
+<!--    </select>-->
+</mapper>

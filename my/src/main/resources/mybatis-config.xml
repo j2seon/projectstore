@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <typeAliases>
+        <typeAlias alias ="UserDto" type="com.my.pro.domain.UserDto"/>
+        <typeAlias alias="BoardDto" type="com.my.pro.domain.BoardDto"/>
+        <typeAlias alias="SearchCondition" type="com.my.pro.domain.SearchCondition"/>
+        <typeAlias alias="CommentDto" type="com.my.pro.domain.CommentDto"/>
+        <typeAlias alias="CateDto" type="com.my.pro.domain.CateDto"/>
+        <typeAlias alias="ProductDto" type="com.my.pro.domain.ProductDto"/>
+        <!--여러개 등록할 수 있다.-->
+        <!--여러개 등록할 수 있다.-->
+        <!--여러개 등록할 수 있다.-->
+    </typeAliases>
+</configuration>
