@@ -76,9 +76,16 @@ public class tourController {
     }
 
     //투어 등록 페이지 보여주기
-    @RequestMapping(value = "register",method = RequestMethod.GET)
+    @RequestMapping(value = "/register",method = RequestMethod.GET)
     public String register (){
         return "tourAdd";
+    }
+
+    @RequestMapping(value = "/popup",method = RequestMethod.GET)
+    public String popup(Model m) throws Exception {
+        List<StoreDto> store = storeService.AllStore();
+        m.addAttribute("store",store);
+        return "popup";
     }
 
 //    @RequestMapping(value = "register",method = RequestMethod.POST)
